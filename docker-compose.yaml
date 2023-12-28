@@ -1,0 +1,27 @@
+version: '3'
+services:
+  app:
+    build: ./
+    ports:
+      - "8080:8080"
+    restart: always
+    environment:
+      DATASOURCES_DEFAULT_URL: jdbc:mysql://db/db
+      DATASOURCES_DEFAULT_USERNAME: admin
+      DATASOURCES_DEFAULT_PASSWORD: admin
+    depends_on:
+      - db
+    links:
+      - db
+  db:
+    image: mysql
+    restart: always
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: true
+      MYSQL_DATABASE: db
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: admin
+    volumes:
+      - ./db:/var/lib/mysql
