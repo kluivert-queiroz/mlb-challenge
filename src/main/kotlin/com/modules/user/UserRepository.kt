@@ -9,9 +9,14 @@ import io.micronaut.data.model.query.builder.sql.Dialect
 import io.micronaut.data.repository.PageableRepository
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
+import java.time.LocalDate
 
 @JdbcRepository(dialect = Dialect.MYSQL)
-interface UserRepository : PageableRepository<User, Long>{
+interface UserRepository : PageableRepository<User, Long> {
     fun findByNameLike(name: String, page: Pageable): Page<User>
-    fun update(@NonNull @NotNull @Id id: Long, @NonNull @NotBlank name: String)
+    fun update(
+        @NonNull @NotNull @Id id: Long,
+        @NonNull @NotBlank name: String,
+        @NonNull @NotNull birthDate: String
+    ): Int
 }

@@ -6,22 +6,88 @@ services:
       - "8080:8080"
     restart: always
     environment:
+      MICRONAUT_ENVIRONMENTS: dev
+      OTEL_EXPORTER_JAEGER_ENDPOINT: http://jaeger:14250
       DATASOURCES_DEFAULT_URL: jdbc:mysql://db/db
       DATASOURCES_DEFAULT_USERNAME: admin
       DATASOURCES_DEFAULT_PASSWORD: admin
     depends_on:
       - db
+      - jaeger
     links:
       - db
+      - jaeger
+    networks:
+      - service
   db:
     image: mysql
     restart: always
     ports:
       - "3306:3306"
     environment:
-      MYSQL_ALLOW_EMPTY_PASSWORD: true
+      MYSQL_ALLOW_EMPTY_PASSWORD: "true"
       MYSQL_DATABASE: db
       MYSQL_USER: admin
       MYSQL_PASSWORD: admin
     volumes:
       - ./db:/var/lib/mysql
+    networks:
+      - service
+  jaeger:
+    image: jaegertracing/all-in-one:1.52
+    ports:
+      - "6831:6831/udp"
+      - "6832:6832/udp"
+      - "5778:5778"
+      - "16686:16686"
+      - "4317:4317"
+      - "4318:4318"
+      - "14250:14250"
+      - "14268:14268"
+      - "14269:14269"
+      - "9411:9411"
+    environment:
+      COLLECTOR_ZIPKIN_HTTP_PORT: 9411
+    networks:
+      - service
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - "./prometheus.yml:/etc/prometheus/prometheus.yml"
+    ports:
+      - "9090:9090"
+    networks:
+      - service
+    depends_on:
+      - app
+  grafana:
+    image: grafana/grafana
+    ports:
+      - 3000:3000
+    volumes:
+      - ./grafana-datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml
+    networks:
+      - service
+    depends_on:
+      - prometheus
+  swagger-ui:
+    image: swaggerapi/swagger-ui
+    ports:
+      - 8081:8080
+    environment:
+      API_URL: http://localhost:8080/swagger/mercado-livre-brasil-challenge-0.0.yml
+    networks:
+      - service
+    depends_on:
+      - app
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8082:8080
+    networks:
+      - service
+    depends_on:
+      - db
+networks:
+  service:

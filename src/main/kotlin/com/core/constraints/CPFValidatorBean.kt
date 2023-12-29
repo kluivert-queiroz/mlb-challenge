@@ -12,9 +12,9 @@ class CPFValidatorBean : ConstraintValidator<CPF, Any> {
     override fun isValid(
         value: Any?, annotationMetadata: AnnotationValue<CPF>?, context: ConstraintValidatorContext?
     ): Boolean {
-        if (value.toString().isEmpty()) return false;
-        val numbers = value.toString().filter { it.isDigit() }.map { it.toString().toInt() }
-        if (numbers.size != 11) return false
+        if (value.toString().isEmpty() || value.toString().length != 11) return false;
+        val numbers = value.toString().map { it.toString().toInt() }
+
         if (numbers.all { it == numbers[0] }) return false
 
         val dv1 = ((0..8).sumOf { (it + 1) * numbers[it] }).rem(11).let {

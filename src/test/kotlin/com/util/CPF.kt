@@ -1,6 +1,7 @@
 package com.util
 
 import kotlin.math.floor
+import kotlin.math.roundToInt
 
 class CPF {
     companion object {
@@ -9,7 +10,7 @@ class CPF {
         }
 
         private fun modByEleven(dividend: Int): Int {
-            return Math.round(dividend - (floor((dividend / 11).toDouble()) * 11)).toInt()
+            return (dividend - (floor((dividend / 11).toDouble()) * 11)).roundToInt()
         }
 
         fun generate(): String {
