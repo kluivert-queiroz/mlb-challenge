@@ -65,8 +65,8 @@ open class UserController(private val userRepository: UserRepository) {
             Parameter(
                 name = "searchByName",
                 `in` = ParameterIn.QUERY,
-                description = "Search by name. Defaults to %%. It support the SQL LIKE pattern. You can try '%20Doe%20' to fetch any name containing 'Doe'.",
-                example = "%20Doe%20",
+                description = "Search by name. Defaults to %%. It support the SQL LIKE pattern. You can try '%20Doe%20'(it must be url escaped) to fetch any name containing 'Doe'.",
+                example = "",
                 schema = Schema(
                     defaultValue = "%%"
                 )

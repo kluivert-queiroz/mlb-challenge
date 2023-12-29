@@ -18,7 +18,7 @@ data class User(
     @NotNull @Schema(example = "john.doe@test.com") val email: String,
     @NotNull @Schema(example = "47277852001") val cpf: String,
     @NotNull @Schema(example = "John Doe") val name: String,
-    @NotNull val birthDate: String,
+    @NotNull @Schema(example = "2000-01-01") val birthDate: String,
     @DateCreated var createdDate: Instant?,
     @DateUpdated var updatedDate: Instant?
 ) {
