@@ -38,7 +38,7 @@ import kotlin.jvm.optionals.getOrNull
 
 @Controller("/users")
 @Tag(name = "Users")
-open class UserController(private val userRepository: UserRepository) {
+open class UserController(private val userRepository: UserRepository, private val userService: UserService) {
 
     @Operation(
         summary = "List users",
@@ -91,7 +91,7 @@ open class UserController(private val userRepository: UserRepository) {
         @Nullable @Positive @QueryValue pageSize: Int? = 50,
         @Nullable @QueryValue searchByName: String = "%%"
     ): HttpResponse<Page<User>> {
-        return Response.ok(userRepository.findByNameLike(searchByName, Pageable.from(page!!, pageSize!!)))
+        return Response.ok(userService.findByNameLike(searchByName, Pageable.from(page!!, pageSize!!)))
     }
 
     @Operation(
@@ -134,9 +134,15 @@ open class UserController(private val userRepository: UserRepository) {
     )
     @Get("/{userId}")
     open fun findById(@Positive @PathVariable userId: Long): HttpResponse<*> {
-        val user = userRepository.findById(userId)
-        if (user.isEmpty) return Response.notFound("User not found")
-        return Response.ok(user.get())
+        return userService.findById(userId).fold(
+            { exception ->
+                when (exception) {
+                    is BadDataException -> Response.notFound(exception.message)
+                    else -> Response.internalServerError("Internal Server Error")
+                }
+            },
+            { user -> Response.ok(user) }
+        )
     }
 
     @Operation(
@@ -191,23 +197,15 @@ open class UserController(private val userRepository: UserRepository) {
     )
     @Post("/")
     open fun create(@Body @Valid createUserCommand: CreateUserCommand): HttpResponse<*> {
-        return try {
-            Response.created(
-                userRepository.save(
-                    User(
-                        createUserCommand.email,
-                        createUserCommand.cpf,
-                        createUserCommand.name,
-                        createUserCommand.birthDate
-                    )
-                )
-            )
-        } catch (e: DataAccessException) {
-            if (e.cause is SQLIntegrityConstraintViolationException) {
-                return Response.badRequest("User with specified email or CPF already exists")
-            }
-            return Response.internalServerError("Internal Server Error")
-        }
+        return userService.create(createUserCommand).fold(
+            { exception ->
+                when (exception) {
+                    is BadDataException -> Response.badRequest(exception.message)
+                    else -> Response.internalServerError("Internal Server Error")
+                }
+            },
+            { user -> Response.created(user) }
+        )
     }
 
     @Operation(
@@ -276,13 +274,14 @@ open class UserController(private val userRepository: UserRepository) {
     open fun update(
         @PathVariable userId: Long, @Body @Valid updateUserCommand: UpdateUserCommand
     ): HttpResponse<*> {
-        val user = userRepository.findById(userId).getOrNull() ?: return Response.notFound("User not found")
-        val name = updateUserCommand.name ?: user.name
-        val birthDate = updateUserCommand.birthDate ?: user.birthDate
-        if(userRepository.update(userId, name, birthDate) > 0 ) {
-            val fetchUser = userRepository.findById(userId).get()
-            return Response.ok(fetchUser)
-        }
-        return Response.internalServerError("An error occurred while updating user")
+        return userService.update(userId, updateUserCommand).fold(
+            { exception ->
+                when (exception) {
+                    is BadDataException -> Response.notFound(exception.message)
+                    else -> Response.internalServerError("Internal Server Error")
+                }
+            },
+            { user -> Response.ok(user) }
+        )
     }
 }
