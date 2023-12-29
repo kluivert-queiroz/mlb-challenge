@@ -36,16 +36,15 @@ class UserService(private val userRepository: UserRepository) {
     }
 
     fun update(id: Long, command: UpdateUserCommand): Either<Exception, User> {
-        val user = userRepository.findById(id)
-        return if (user.isPresent) {
-            val updatedUser = user.get()
-                .copy(
-                    name = command.name ?: user.get().name,
-                    birthDate = command.birthDate ?: user.get().birthDate
-                )
-            Either.Right(userRepository.update(updatedUser))
-        } else {
-            Either.Left(BadDataException("User with specified id does not exist"))
-        }
+        val user = findById(id)
+        return user.fold(
+            { Either.Left(it) },
+            {
+                val updatedUser =
+                    it.copy(name = command.name ?: it.name, birthDate = command.birthDate ?: it.birthDate)
+                Either.Right(userRepository.update(updatedUser))
+            }
+        )
+
     }
 }

@@ -2,43 +2,32 @@ package com.modules.user
 
 import com.core.http.ErrorResponse
 import com.core.http.Response
-import com.fasterxml.jackson.core.type.TypeReference
-import io.micronaut.core.type.Argument
-import io.micronaut.data.exceptions.DataAccessException
 import io.micronaut.data.model.Page
 import io.micronaut.data.model.Pageable
-import io.micronaut.http.HttpRequest
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.annotation.Body
 import io.micronaut.http.annotation.Controller
-import io.micronaut.http.annotation.Error
 import io.micronaut.http.annotation.Get
 import io.micronaut.http.annotation.PathVariable
 import io.micronaut.http.annotation.Post
 import io.micronaut.http.annotation.Put
 import io.micronaut.http.annotation.QueryValue
-import io.micronaut.openapi.annotation.OpenAPIGroup
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
-import io.swagger.v3.oas.annotations.Parameters
 import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
-import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.annotation.Nullable
-import jakarta.validation.ConstraintViolationException
 import jakarta.validation.Valid
 import jakarta.validation.constraints.Positive
 import jakarta.validation.constraints.PositiveOrZero
-import java.sql.SQLIntegrityConstraintViolationException
-import kotlin.jvm.optionals.getOrNull
 
 @Controller("/users")
 @Tag(name = "Users")
-open class UserController(private val userRepository: UserRepository, private val userService: UserService) {
+open class UserController(private val userService: UserService) {
 
     @Operation(
         summary = "List users",
