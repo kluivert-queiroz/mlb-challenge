@@ -37,7 +37,7 @@ class UserServiceTest(private val userService: UserService, private val userRepo
         val command = getCreateUserCommand()
         val user = userService.create(command)
         user.isLeft() shouldBe true
-        user.swap().getOrNull() shouldBe BadDataException("User with specified email or CPF already exists")
+        user.swap().getOrNull() shouldBe UserProblem.DuplicatedEmailOrCPF
     }
     "should find user by id" {
         val mockUserRepository = getMock(userRepository)
@@ -52,7 +52,7 @@ class UserServiceTest(private val userService: UserService, private val userRepo
         every { mockUserRepository.findById(any()) } answers { dummyUser }
         val user = userService.findById(1)
         user.isLeft() shouldBe true
-        user.swap().getOrNull() shouldBe BadDataException("User with specified id does not exist")
+        user.swap().getOrNull() shouldBe UserProblem.NotFound(1)
     }
     "should update user" {
         val mockUserRepository = getMock(userRepository)

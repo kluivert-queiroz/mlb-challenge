@@ -123,15 +123,12 @@ open class UserController(private val userService: UserService) {
     )
     @Get("/{userId}")
     open fun findById(@Positive @PathVariable userId: Long): HttpResponse<*> {
-        return userService.findById(userId).fold(
-            { exception ->
-                when (exception) {
-                    is BadDataException -> Response.notFound(exception.message)
-                    else -> Response.internalServerError("Internal Server Error")
-                }
-            },
-            { user -> Response.ok(user) }
-        )
+        return userService.findById(userId).fold({ exception ->
+            when (exception) {
+                is UserProblem.NotFound -> Response.notFound("User with specified id does not exist")
+                else -> Response.internalServerError("Internal Server Error")
+            }
+        }, { user -> Response.ok(user) })
     }
 
     @Operation(
@@ -186,15 +183,15 @@ open class UserController(private val userService: UserService) {
     )
     @Post("/")
     open fun create(@Body @Valid createUserCommand: CreateUserCommand): HttpResponse<*> {
-        return userService.create(createUserCommand).fold(
-            { exception ->
-                when (exception) {
-                    is BadDataException -> Response.badRequest(exception.message)
-                    else -> Response.internalServerError("Internal Server Error")
-                }
-            },
-            { user -> Response.created(user) }
-        )
+        return userService.create(createUserCommand).fold({ exception ->
+            when (exception) {
+                is UserProblem.DuplicatedEmailOrCPF -> Response.badRequest(
+                    "User with specified email or CPF already exists"
+                )
+
+                else -> Response.internalServerError("Internal Server Error")
+            }
+        }, { user -> Response.created(user) })
     }
 
     @Operation(
@@ -263,14 +260,11 @@ open class UserController(private val userService: UserService) {
     open fun update(
         @PathVariable userId: Long, @Body @Valid updateUserCommand: UpdateUserCommand
     ): HttpResponse<*> {
-        return userService.update(userId, updateUserCommand).fold(
-            { exception ->
-                when (exception) {
-                    is BadDataException -> Response.notFound(exception.message)
-                    else -> Response.internalServerError("Internal Server Error")
-                }
-            },
-            { user -> Response.ok(user) }
-        )
+        return userService.update(userId, updateUserCommand).fold({ exception ->
+            when (exception) {
+                is UserProblem.NotFound -> Response.notFound("User with specified id does not exist")
+                else -> Response.internalServerError("Internal Server Error")
+            }
+        }, { user -> Response.ok(user) })
     }
 }
