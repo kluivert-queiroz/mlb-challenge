@@ -20,7 +20,7 @@ services:
     networks:
       - service
   db:
-    image: mysql
+    image: mysql:8.2.0
     restart: always
     ports:
       - "3306:3306"
