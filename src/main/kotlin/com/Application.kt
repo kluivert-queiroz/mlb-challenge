@@ -6,7 +6,7 @@ import io.swagger.v3.oas.annotations.info.*
 
 @OpenAPIDefinition(
     info = Info(
-        title = "Mercado Livre Brasil Challenge", version = "0.0", description = "Simple crud for user management"
+        title = "Users Service", version = "0.0", description = "Simple crud for user management"
     )
 )
 object Api {}

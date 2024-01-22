@@ -1,4 +1,4 @@
-## Mercado Livre Brasil Challenhge
+## Users Service
 This challenge contains: 
 - API containing CRUD of users at `http://localhost:8080`
 - Documentation on Swagger UI at `http://localhost:8081`
