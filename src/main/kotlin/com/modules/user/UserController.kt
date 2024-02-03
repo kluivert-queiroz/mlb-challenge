@@ -78,9 +78,12 @@ open class UserController(private val userService: UserService) {
     open fun listUsers(
         @Nullable @PositiveOrZero @QueryValue page: Int? = 0,
         @Nullable @Positive @QueryValue pageSize: Int? = 50,
-        @Nullable @QueryValue searchByName: String = "%%"
+        @Nullable @QueryValue searchByName: String = ""
     ): HttpResponse<Page<User>> {
-        return Response.ok(userService.findByNameLike(searchByName, Pageable.from(page!!, pageSize!!)))
+        if(searchByName.isBlank())
+            return Response.ok(userService.list(Pageable.from(page!!, pageSize!!)))
+
+        return Response.ok(userService.searchByName(searchByName, Pageable.from(page!!, pageSize!!)))
     }
 
     @Operation(

@@ -59,7 +59,7 @@ class E2E(@Inject @Client("/") private val client: HttpClient, private val userR
             addRandomUser("John Smith")
             userRepository.count().shouldBe(3)
             val response = client.toBlocking().retrieve(
-                HttpRequest.GET<Page<User>>("/users?searchByName=%25Doe%25"),
+                HttpRequest.GET<Page<User>>("/users?searchByName=Doe"),
                 Argument.of(Page::class.java as Class<Page<User>>, User::class.java)
             )
             response.totalSize.shouldBe(names.size)

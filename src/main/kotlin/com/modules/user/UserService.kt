@@ -5,6 +5,7 @@ import arrow.core.left
 import arrow.core.raise.catch
 import arrow.core.raise.either
 import arrow.core.right
+import io.micronaut.core.annotation.NonNull
 import io.micronaut.data.model.Page
 import io.micronaut.data.model.Pageable
 import jakarta.inject.Singleton
@@ -23,8 +24,8 @@ class UserService(private val userRepository: UserRepository) {
 
     }
 
-    fun findByNameLike(name: String, pageable: Pageable): Page<User> {
-        return userRepository.findByNameLike(name, pageable)
+    fun searchByName(name: String, pageable: Pageable): Page<User> {
+        return userRepository.searchByName(name, pageable)
     }
 
     fun findById(id: Long): Either<UserProblem, User> {
@@ -40,5 +41,9 @@ class UserService(private val userRepository: UserRepository) {
             Either.Right(userRepository.update(updatedUser))
         })
 
+    }
+
+    fun list(from: @NonNull Pageable?): Page<User> {
+        return userRepository.findAll(from)
     }
 }

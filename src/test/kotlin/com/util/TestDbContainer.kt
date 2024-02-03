@@ -2,7 +2,7 @@ package com.util
 
 import org.testcontainers.containers.MySQLContainer
 
-class TestDbContainer : MySQLContainer<TestDbContainer>("mysql"){
+class TestDbContainer : MySQLContainer<TestDbContainer>("mysql:8.1"){
     companion object {
         private lateinit var instance: TestDbContainer
 
